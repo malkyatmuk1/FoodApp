@@ -42,6 +42,14 @@ public class FoodServiceImpl
     }
 
     @Override
+    public void deleteFood(String foodId) {
+        Optional<Food> foodToDelete = this.foodRepository.findById(foodId);
+        if(foodToDelete.isPresent()){
+            this.foodRepository.delete(foodToDelete.get());
+        }
+    }
+
+    @Override
     public Optional<Food> getFoodById(String id) {
         return this.foodRepository.findById(id);
     }

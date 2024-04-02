@@ -10,11 +10,9 @@ export default function AddComponent() {
         try {
             if (validateForm()) {
                 const response = await fetch(`http://localhost:8081/add/food`, {
-                    method: 'POST',
-                    headers: {
+                    method: 'POST', headers: {
                         'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(food),
+                    }, body: JSON.stringify(food),
                 }).then(() => {
                     navigate("/");
                 });
@@ -34,8 +32,7 @@ export default function AddComponent() {
     const handleChange = (event) => {
         const {id, value} = event.target;
         setFood({
-            ...food,
-            [id]: value,
+            ...food, [id]: value,
         });
     };
 
@@ -67,8 +64,7 @@ export default function AddComponent() {
         setFoodError(errors);
         return isValid;
     }
-    return (
-        <div>
+    return (<div>
             <h1>Add food item</h1>
             <Grid container spacing={2}>
                 <Grid item lg={8} md={8} xs={12}>
@@ -133,6 +129,5 @@ export default function AddComponent() {
             </Grid>
             <Button onClick={handleBack}>Back</Button>
             <Button onClick={handleAdd}>Add</Button>
-        </div>
-    );
+        </div>);
 }

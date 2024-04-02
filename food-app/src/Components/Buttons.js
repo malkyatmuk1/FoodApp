@@ -15,14 +15,17 @@ function Buttons({element, onRefresh, onDeleteSelected}) {
     const handleDelete = async (event) => {
         try {
             event.stopPropagation();
-            const response = await fetch(`http://localhost:8081/food/delete/${element.foodId}`, {
-                method: 'DELETE',
-            });
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
+            const isConfirmed = window.confirm("Сигурни ли сте, че искате да изтриете " + element.description + " ?");
+            if (isConfirmed) {
+                const response = await fetch(`http://localhost:8081/food/delete/${element.foodId}`, {
+                    method: 'DELETE',
+                });
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                onDeleteSelected(element.foodId);
+                onRefresh();
             }
-            onDeleteSelected(element.foodId);
-            onRefresh();
         } catch (error) {
             console.error('Failed to delete the item:', error);
         }
@@ -32,13 +35,13 @@ function Buttons({element, onRefresh, onDeleteSelected}) {
         navigate("/view", {state: {foodId: element.foodId}});
     };
     return (<div>
-            <ButtonGroup variant="text" aria-label="Basic button group">
-                <Button onClick={handleView}>View</Button>
-                <Button onClick={handleOpen}>Edit</Button>
-                <Button onClick={handleDelete}>Delete</Button>
-            </ButtonGroup>
-            {openModal && <ModalEdit onClose={() => setOpenModal(false)} element={element}></ModalEdit>}
-        </div>);
+        <ButtonGroup variant="text" aria-label="Basic button group">
+            <Button onClick={handleView}>View</Button>
+            <Button onClick={handleOpen}>Edit</Button>
+            <Button onClick={handleDelete}>Delete</Button>
+        </ButtonGroup>
+        {openModal && <ModalEdit onClose={() => setOpenModal(false)} element={element}></ModalEdit>}
+    </div>);
 }
 
 export default Buttons;

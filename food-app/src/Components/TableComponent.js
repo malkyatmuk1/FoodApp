@@ -97,27 +97,27 @@ function TableComponent() {
         };
 
         return (<TableHead>
-                <TableRow>
-                    {headCells.map((headCell) => (<TableCell
-                            key={headCell.id}
-                            align={headCell.numeric ? 'right' : 'left'}
-                            padding={headCell.disablePadding ? 'none' : 'normal'}
-                            style={{fontWeight: "bold"}}
-                            sortDirection={orderBy === headCell.id ? order : false}
-                        >
-                            <TableSortLabel
-                                active={orderBy === headCell.id}
-                                direction={orderBy === headCell.id ? order : 'asc'}
-                                onClick={createSortHandler(headCell.id)}
-                            >
-                                {headCell.label}
-                                {orderBy === headCell.id ? (<Box component="span" sx={visuallyHidden}>
-                                        {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                                    </Box>) : null}
-                            </TableSortLabel>
-                        </TableCell>))}
-                </TableRow>
-            </TableHead>);
+            <TableRow>
+                {headCells.map((headCell, index) => (<TableCell
+                    key={headCell.id || index}
+                    align={headCell.numeric ? 'right' : 'left'}
+                    padding={headCell.disablePadding ? 'none' : 'normal'}
+                    style={{fontWeight: "bold"}}
+                    sortDirection={orderBy === headCell.id ? order : false}
+                >
+                    <TableSortLabel
+                        active={orderBy === headCell.id}
+                        direction={orderBy === headCell.id ? order : 'asc'}
+                        onClick={createSortHandler(headCell.id)}
+                    >
+                        {headCell.label}
+                        {orderBy === headCell.id ? (<Box component="span" sx={visuallyHidden}>
+                            {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                        </Box>) : null}
+                    </TableSortLabel>
+                </TableCell>))}
+            </TableRow>
+        </TableHead>);
     }
 
     EnhancedTableHead.propTypes = {
@@ -222,6 +222,7 @@ function TableComponent() {
                             size={'small'}
                         >
                             <EnhancedTableHead
+                                key={"unique1"}
                                 numSelected={selected?.length}
                                 order={order}
                                 orderBy={orderBy}
@@ -232,37 +233,37 @@ function TableComponent() {
                                 {visibleRows?.map((row, index) => {
                                     const labelId = `enhanced-table-checkbox-${index}`;
                                     return (<TableRow
-                                            hover
-                                            onClick={(event) => handleClick(event, row)}
-                                            tabIndex={-1}
-                                            key={row.foodId}
-                                            sx={{cursor: 'pointer'}}
+                                        hover
+                                        onClick={(event) => handleClick(event, row)}
+                                        tabIndex={-1}
+                                        key={row.foodId}
+                                        sx={{cursor: 'pointer'}}
+                                    >
+                                        <TableCell
+                                            component="th"
+                                            id={labelId}
+                                            scope="row"
+                                            padding="none"
                                         >
-                                            <TableCell
-                                                component="th"
-                                                id={labelId}
-                                                scope="row"
-                                                padding="none"
-                                            >
-                                                {row.description}
-                                            </TableCell>
-                                            <TableCell align="right">{row.kcal}</TableCell>
-                                            <TableCell align="right">{row.protein}</TableCell>
-                                            <TableCell align="right">{row.fat}</TableCell>
-                                            <TableCell align="right">{row.carbs}</TableCell>
-                                            <TableCell align="right">
-                                                <Buttons element={row} onRefresh={refreshRows}
-                                                         onDeleteSelected={removeSelectedFoodWhenDelete}></Buttons>
-                                            </TableCell>
-                                        </TableRow>);
+                                            {row.description}
+                                        </TableCell>
+                                        <TableCell align="right">{row.kcal}</TableCell>
+                                        <TableCell align="right">{row.protein}</TableCell>
+                                        <TableCell align="right">{row.fat}</TableCell>
+                                        <TableCell align="right">{row.carbs}</TableCell>
+                                        <TableCell align="right">
+                                            <Buttons element={row} onRefresh={refreshRows}
+                                                     onDeleteSelected={removeSelectedFoodWhenDelete}></Buttons>
+                                        </TableCell>
+                                    </TableRow>);
                                 })}
                                 {emptyRows > 0 && (<TableRow
-                                        style={{
-                                            height: 33 * emptyRows,
-                                        }}
-                                    >
-                                        <TableCell colSpan={6}/>
-                                    </TableRow>)}
+                                    style={{
+                                        height: 33 * emptyRows,
+                                    }}
+                                >
+                                    <TableCell colSpan={6}/>
+                                </TableRow>)}
                             </TableBody>
                         </Table>
                     </TableContainer>
@@ -308,7 +309,7 @@ function TableComponent() {
                             size={'small'}
                         >
                             <EnhancedTableHead
-                                key={"unique"}
+                                key={"un"}
                                 numSelected={selected?.length}
                                 order={order}
                                 orderBy={orderBy}
@@ -319,26 +320,26 @@ function TableComponent() {
                                     const labelId = `enhanced-table-checkbox-${index}`;
 
                                     return (<>
-                                            <TableRow
-                                                hover
-                                                tabIndex={-1}
-                                                key={row.foodId}
-                                                sx={{cursor: 'pointer'}}
+                                        <TableRow
+                                            hover
+                                            tabIndex={-1}
+                                            key={row.foodId || index}
+                                            sx={{cursor: 'pointer'}}
+                                        >
+                                            <TableCell
+                                                component="th"
+                                                id={labelId}
+                                                scope="row"
+                                                padding="none"
                                             >
-                                                <TableCell
-                                                    component="th"
-                                                    id={labelId}
-                                                    scope="row"
-                                                    padding="none"
-                                                >
-                                                    {row.description}
-                                                </TableCell>
-                                                <TableCell align="right">{row.kcal}</TableCell>
-                                                <TableCell align="right">{row.protein}</TableCell>
-                                                <TableCell align="right">{row.fat}</TableCell>
-                                                <TableCell align="right">{row.carbs}</TableCell>
-                                            </TableRow>
-                                        </>);
+                                                {row.description}
+                                            </TableCell>
+                                            <TableCell align="right">{row.kcal}</TableCell>
+                                            <TableCell align="right">{row.protein}</TableCell>
+                                            <TableCell align="right">{row.fat}</TableCell>
+                                            <TableCell align="right">{row.carbs}</TableCell>
+                                        </TableRow>
+                                    </>);
                                 })}
 
                                 {<TableRow
@@ -371,14 +372,14 @@ function TableComponent() {
     }
 
     return (<div>
-            <div>
-                {SelectedTable()}
-            </div>
-            <div>
-                {EnhancedTable()}
-            </div>
+        <div key={987}>
+            {SelectedTable()}
+        </div>
+        <div key={897}>
+            {EnhancedTable()}
+        </div>
 
-        </div>);
+    </div>);
 }
 
 export default TableComponent;

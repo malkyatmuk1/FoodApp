@@ -14,16 +14,15 @@ const style = {
     borderRadius: '10px',
     p: 4,
 };
+
 function ModalEdit({onClose, element}) {
     const [food, setFood] = React.useState(element);
     const handleEdit = async (event) => {
         try {
             const response = await fetch(`http://localhost:8081/edit/food`, {
-                method: 'PUT',
-                headers: {
+                method: 'PUT', headers: {
                     'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(food),
+                }, body: JSON.stringify(food),
             });
 
             if (!response.ok) {
@@ -37,18 +36,16 @@ function ModalEdit({onClose, element}) {
     };
 
     const handleChange = (event) => {
-        const { id, value } = event.target;
+        const {id, value} = event.target;
         setFood(prevModel => ({
-            ...prevModel,
-            [id]: value
+            ...prevModel, [id]: value
         }));
     };
     const handleClickOnModal = (event) => {
-      event.stopPropagation();
+        event.stopPropagation();
     };
 
-    return (
-        <div>
+    return (<div>
             <Modal
                 open={food !== undefined}
                 onClose={onClose}
@@ -62,66 +59,66 @@ function ModalEdit({onClose, element}) {
                     <h1> Edit food item</h1>
                     <FormControl defaultValue="" required>
                         <Grid container spacing={2}>
-                        <Grid item lg={8} md={8} xs={12}>
-                            <TextField
-                                style={{width:"100%"}}
-                                id="description"
-                                label="Description"
-                                margin="normal"
-                                defaultValue={food.description}
-                                onChange={handleChange}
-                            />
+                            <Grid item lg={8} md={8} xs={12}>
+                                <TextField
+                                    style={{width: "100%"}}
+                                    id="description"
+                                    label="Description"
+                                    margin="normal"
+                                    defaultValue={food.description}
+                                    onChange={handleChange}
+                                />
+                            </Grid>
+                            <Grid item lg={4} md={4} xs={12}>
+                                <TextField
+                                    style={{width: "100%"}}
+                                    margin="normal"
+                                    id="kcal"
+                                    label="Calories"
+                                    type="number"
+                                    defaultValue={food.kcal}
+                                    onChange={handleChange}
+                                />
+                            </Grid>
+                            <Grid item lg={4} md={4} xs={12}>
+                                <TextField
+                                    style={{width: "100%"}}
+                                    id="protein"
+                                    label="Protein"
+                                    margin="normal"
+                                    type="number"
+                                    defaultValue={food.protein}
+                                    onChange={handleChange}
+                                />
+                            </Grid>
+                            <Grid item lg={4} md={4} xs={12}>
+                                <TextField
+                                    style={{width: "100%"}}
+                                    margin="normal"
+                                    id="fats"
+                                    label="Fats"
+                                    type="number"
+                                    defaultValue={food.fat}
+                                    onChange={handleChange}
+                                />
+                            </Grid>
+                            <Grid item lg={4} md={4} xs={12}>
+                                <TextField
+                                    style={{width: "100%"}}
+                                    margin="normal"
+                                    id="carbs"
+                                    label="Carbs"
+                                    type="number"
+                                    defaultValue={food.carbs}
+                                    onChange={handleChange}
+                                />
+                            </Grid>
                         </Grid>
-                        <Grid item lg={4} md={4} xs={12}>
-                            <TextField
-                                style={{width:"100%"}}
-                                margin="normal"
-                                id="kcal"
-                                label="Calories"
-                                type="number"
-                                defaultValue={food.kcal}
-                                onChange={handleChange}
-                            />
-                       </Grid>
-                        <Grid item lg={4} md={4} xs={12}>
-                            <TextField
-                                style={{width:"100%"}}
-                                id="protein"
-                                label="Protein"
-                                margin="normal"
-                                type="number"
-                                defaultValue={food.protein}
-                                onChange={handleChange}
-                            />
-                        </Grid>
-                        <Grid item lg={4} md={4} xs={12}>
-                            <TextField
-                                style={{width:"100%"}}
-                                margin="normal"
-                                id="fats"
-                                label="Fats"
-                                type="number"
-                                defaultValue={food.fat}
-                                onChange={handleChange}
-                            />
-                        </Grid>
-                        <Grid item lg={4} md={4} xs={12}>
-                            <TextField
-                                style={{width:"100%"}}
-                                margin="normal"
-                                id="carbs"
-                                label="Carbs"
-                                type="number"
-                                defaultValue={food.carbs}
-                                onChange={handleChange}
-                            />
-                        </Grid>
-                    </Grid>
                         <Button onClick={handleEdit}>Save</Button>
                     </FormControl>
                 </Box>
             </Modal>
-        </div>
-    );
+        </div>);
 }
+
 export default ModalEdit;

@@ -9,6 +9,7 @@ public interface IFoodService {
     void addFood(FoodDTO food);
 
     void editFood(FoodDTO food);
+    void deleteFood(String id);
 
     Optional<Food> getFoodById(String id);
 }

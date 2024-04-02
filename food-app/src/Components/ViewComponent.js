@@ -1,7 +1,7 @@
 import * as React from 'react';
+import {useEffect} from 'react';
 import {useLocation, useNavigate} from "react-router-dom";
 import {Button, Grid, TextField} from "@mui/material";
-import {useEffect} from "react";
 
 export default function ViewComponent() {
     const {state} = useLocation();
@@ -9,7 +9,7 @@ export default function ViewComponent() {
     const [food, setFood] = React.useState(null);
 
     useEffect(() => {
-        fetch(`http://localhost:8081/food/view/`+foodId)
+        fetch(`http://localhost:8081/food/view/` + foodId)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -25,7 +25,7 @@ export default function ViewComponent() {
     }, []);
     const navigate = useNavigate();
     const handleBack = () => {
-       navigate("/");
+        navigate("/");
     }
     return (
         <div>
@@ -38,9 +38,9 @@ export default function ViewComponent() {
                         label="Description"
                         margin="normal"
                         value={food?.description}
-                         InputProps={{
-                             readOnly: true,
-                         }}
+                        InputProps={{
+                            readOnly: true,
+                        }}
                         InputLabelProps={{
                             shrink: true,
                         }}
