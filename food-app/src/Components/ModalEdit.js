@@ -14,16 +14,10 @@ const style = {
     borderRadius: '10px',
     p: 4,
 };
-export default function ModalEdit(props) {
-    const [open, setOpen] = React.useState(props.open_modal);
-    const [food, setFood] = React.useState(props.element);
-    const handleClose = () => {
-        setOpen(false);
-        props.notify_parent();
-    }
+function ModalEdit({onClose, element}) {
+    const [food, setFood] = React.useState(element);
     const handleEdit = async (event) => {
         try {
-
             const response = await fetch(`http://localhost:8081/edit/food`, {
                 method: 'PUT',
                 headers: {
@@ -31,32 +25,34 @@ export default function ModalEdit(props) {
                 },
                 body: JSON.stringify(food),
             });
-            setOpen(false);
-            props.notify_parent();
-            event.stopPropagation();
+
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
 
-            //const updatedUser = await response.json();
+            onClose();
         } catch (error) {
             console.error('Failed to update food:', error);
         }
     };
 
     const handleChange = (event) => {
-        console.log(event.target);
         const { id, value } = event.target;
         setFood(prevModel => ({
             ...prevModel,
             [id]: value
         }));
     };
+    const handleClickOnModal = (event) => {
+      event.stopPropagation();
+    };
+
     return (
         <div>
             <Modal
-                open={open}
-                onClose={handleClose}
+                open={food !== undefined}
+                onClose={onClose}
+                onClick={handleClickOnModal}
                 aria-labelledby="modal-modal-title"
                 title="Edit Food"
                 aria-describedby="modal-modal-description"
@@ -128,3 +124,4 @@ export default function ModalEdit(props) {
         </div>
     );
 }
+export default ModalEdit;

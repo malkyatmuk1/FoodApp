@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
-import {alpha} from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -26,6 +25,10 @@ function TableComponent() {
     const [selected, setSelected] = useState([]);
 
     useEffect(() => {
+        fetchRows();
+    }, []);
+
+    function fetchRows() {
         fetch('http://localhost:8081/food')
             .then(response => {
                 if (!response.ok) {
@@ -39,7 +42,15 @@ function TableComponent() {
             .catch(error => {
                 console.error('There was a problem with your fetch operation:', error);
             });
-    }, []);
+    }
+
+    function refreshRows() {
+        fetchRows();
+    }
+
+    const removeSelectedFoodWhenDelete = (itemId) => {
+        setSelected((currentSelected) => currentSelected.filter((item) => item.foodId !== itemId));
+    };
 
     function descendingComparator(a, b, orderBy) {
         if (b[orderBy] < a[orderBy]) {
@@ -52,9 +63,7 @@ function TableComponent() {
     }
 
     function getComparator(order, orderBy) {
-        return order === 'desc'
-            ? (a, b) => descendingComparator(a, b, orderBy)
-            : (a, b) => -descendingComparator(a, b, orderBy);
+        return order === 'desc' ? (a, b) => descendingComparator(a, b, orderBy) : (a, b) => -descendingComparator(a, b, orderBy);
     }
 
     function stableSort(array, comparator) {
@@ -69,51 +78,27 @@ function TableComponent() {
         return stabilizedThis?.map((el) => el[0]);
     }
 
-    const headCells = [
-        {
-            id: 'description',
-            numeric: false,
-            disablePadding: true,
-            label: 'Description',
-        },
-        {
-            id: 'kcal',
-            numeric: true,
-            disablePadding: false,
-            label: 'Calories',
-        },
-        {
-            id: 'protein',
-            numeric: true,
-            disablePadding: false,
-            label: 'Protein(g)',
-        },
-        {
-            id: 'fats',
-            numeric: true,
-            disablePadding: false,
-            label: 'Fats(g)',
-        },
-        {
-            id: 'carbs',
-            numeric: true,
-            disablePadding: false,
-            label: 'Carbs(g)',
-        },
-    ];
+    const headCells = [{
+        id: 'description', numeric: false, disablePadding: true, label: 'Description',
+    }, {
+        id: 'kcal', numeric: true, disablePadding: false, label: 'Calories',
+    }, {
+        id: 'protein', numeric: true, disablePadding: false, label: 'Protein(g)',
+    }, {
+        id: 'fats', numeric: true, disablePadding: false, label: 'Fats(g)',
+    }, {
+        id: 'carbs', numeric: true, disablePadding: false, label: 'Carbs(g)',
+    },];
 
     function EnhancedTableHead(props) {
-        const {order, orderBy, onRequestSort} =
-            props;
+        const {order, orderBy, onRequestSort} = props;
         const createSortHandler = (property) => (event) => {
             onRequestSort(event, property);
         };
 
-        return (
-            <TableHead>
+        return (<TableHead>
                 <TableRow>
-                    {headCells.map((headCell) => (
-                        <TableCell
+                    {headCells.map((headCell) => (<TableCell
                             key={headCell.id}
                             align={headCell.numeric ? 'right' : 'left'}
                             padding={headCell.disablePadding ? 'none' : 'normal'}
@@ -126,17 +111,13 @@ function TableComponent() {
                                 onClick={createSortHandler(headCell.id)}
                             >
                                 {headCell.label}
-                                {orderBy === headCell.id ? (
-                                    <Box component="span" sx={visuallyHidden}>
+                                {orderBy === headCell.id ? (<Box component="span" sx={visuallyHidden}>
                                         {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                                    </Box>
-                                ) : null}
+                                    </Box>) : null}
                             </TableSortLabel>
-                        </TableCell>
-                    ))}
+                        </TableCell>))}
                 </TableRow>
-            </TableHead>
-        );
+            </TableHead>);
     }
 
     EnhancedTableHead.propTypes = {
@@ -144,80 +125,7 @@ function TableComponent() {
         onRequestSort: PropTypes.func.isRequired,
         order: PropTypes.oneOf(['asc', 'desc']).isRequired,
         orderBy: PropTypes.string.isRequired,
-      /*  rowCount: PropTypes.number.isRequired,*/
     };
-
-    /*    function EnhancedTableToolbar(props) {
-            const {numSelected} = props;
-            const {searchValue} = props;
-            const {setSearchValue} = props;
-
-
-            const navigate = useNavigate();
-            const handleAdd = () => {
-                navigate("/add");
-            }
-    /!*        const handleSearch = (event) => {
-                const searchVal = event.target.value;
-                const result = [];
-                allRows?.forEach(row => {
-                    if (!searchVal?.length || row.description.toString().toLowerCase().includes(searchVal.toLowerCase())
-                        || row.kcal.toString().toLowerCase().includes(searchVal.toLowerCase())
-                        || row.protein.toString().toLowerCase().includes(searchVal.toLowerCase())
-                        || row.fat.toString().toLowerCase().includes(searchVal.toLowerCase())
-                        || row.carbs.toString().toLowerCase().includes(searchVal.toLowerCase())) {
-                        result.push(row);
-                    }
-                });
-                setSearchValue(searchVal);
-                setRowsFiltered(result);
-    /!*            setTimeout(() => {
-                    const l = document.getElementById("search");
-                    l.focus();
-                }, 100);*!/
-            }*!/
-
-
-            return (
-                <Toolbar
-                    sx={{
-                        pl: {sm: 2},
-                        pr: {xs: 1, sm: 1},
-                        ...(numSelected > 0 && {
-                            bgcolor: (theme) =>
-                                alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
-                        }),
-                    }}
-                >
-                    <Grid container spacing={2}>
-                        <Grid item lg={3} md={6} xs={10}>
-                            <TextField
-                                style={{width: "100%"}}
-                                id="search"
-                                label="Search"
-                                margin="normal"
-                                value={searchValue}
-                                onChange={(e) => setSearchValue(e.target.value)}
-                            />
-                        </Grid>
-                        <Grid item lg={9} md={6} xs={2}>
-                            <Tooltip title="Add" style={{zoom: "1.5", paddingTop: "15px", float: "right"}}>
-                                <IconButton onClick={handleAdd}>
-                                    <AddCircleIcon style={{color: "green"}}/>
-                                </IconButton>
-                            </Tooltip>
-                        </Grid>
-                    </Grid>
-                </Toolbar>
-            );
-        }
-
-
-        EnhancedTableToolbar.propTypes = {
-            numSelected: PropTypes.number.isRequired,
-            searchValue: PropTypes.string,
-            setSearchValue: PropTypes.func
-        };*/
 
     function EnhancedTable() {
         const [order, setOrder] = useState('asc');
@@ -238,12 +146,12 @@ function TableComponent() {
         };
 
         const handleClick = (event, element) => {
-            const alreadySelected = selected.some((el) => el.foodId === element.foodId);
+            const alreadySelected = selected?.some((el) => el.foodId === element.foodId);
 
             if (!alreadySelected) {
                 setSelected([...selected, element]);
             } else {
-                const result = selected.filter((el) => el.foodId !== element.foodId);
+                const result = selected?.filter((el) => el.foodId !== element.foodId);
                 setSelected(result);
             }
         };
@@ -257,20 +165,12 @@ function TableComponent() {
             setPage(0);
         };
 
-        const handleDeleteElements = (index) => {
-            rowsFiltered.splice(index, 1);
-        }
-
         const rowsFiltered = React.useMemo(() => {
             if (!searchValue) return allRows;
             const result = [];
             if (allRows.length > 0) {
                 allRows?.forEach(row => {
-                    if (!searchValue?.length || row.description.toString().toLowerCase().includes(searchValue.toLowerCase())
-                        || row.kcal.toString().toLowerCase().includes(searchValue.toLowerCase())
-                        || row.protein.toString().toLowerCase().includes(searchValue.toLowerCase())
-                        || row.fat.toString().toLowerCase().includes(searchValue.toLowerCase())
-                        || row.carbs.toString().toLowerCase().includes(searchValue.toLowerCase())) {
+                    if (!searchValue?.length || row.description.toString().toLowerCase().includes(searchValue.toLowerCase()) || row.kcal.toString().toLowerCase().includes(searchValue.toLowerCase()) || row.protein.toString().toLowerCase().includes(searchValue.toLowerCase()) || row.fat.toString().toLowerCase().includes(searchValue.toLowerCase()) || row.carbs.toString().toLowerCase().includes(searchValue.toLowerCase())) {
                         result.push(row);
                     }
                 });
@@ -279,26 +179,20 @@ function TableComponent() {
             return [];
         }, [searchValue, allRows]);
 
-        const emptyRows =
-            page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rowsFiltered.length) : 0;
+        const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rowsFiltered.length) : 0;
 
         const visibleRows = React.useMemo(() => {
             if (rowsFiltered && rowsFiltered.length > 0) {
-                return stableSort(rowsFiltered, getComparator(order, orderBy)).slice(
-                    page * rowsPerPage,
-                    page * rowsPerPage + rowsPerPage,
-                );
+                return stableSort(rowsFiltered, getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage,);
             }
             return [];
         }, [allRows, rowsFiltered, order, orderBy, page, rowsPerPage]);
 
-        return (
-            <Box sx={{width: '100%'}}>
+        return (<Box sx={{width: '100%'}}>
                 <Paper sx={{width: '100%', mb: 2}} style={{padding: "20px"}}>
                     <Toolbar
                         sx={{
-                            pl: {sm: 2},
-                            pr: {xs: 1, sm: 1}
+                            pl: {sm: 2}, pr: {xs: 1, sm: 1}
                         }}
                     >
                         <Grid container spacing={2}>
@@ -328,7 +222,7 @@ function TableComponent() {
                             size={'small'}
                         >
                             <EnhancedTableHead
-                                numSelected={selected.length}
+                                numSelected={selected?.length}
                                 order={order}
                                 orderBy={orderBy}
                                 onRequestSort={handleRequestSort}
@@ -337,8 +231,7 @@ function TableComponent() {
                             <TableBody>
                                 {visibleRows?.map((row, index) => {
                                     const labelId = `enhanced-table-checkbox-${index}`;
-                                    return (
-                                        <TableRow
+                                    return (<TableRow
                                             hover
                                             onClick={(event) => handleClick(event, row)}
                                             tabIndex={-1}
@@ -357,20 +250,19 @@ function TableComponent() {
                                             <TableCell align="right">{row.protein}</TableCell>
                                             <TableCell align="right">{row.fat}</TableCell>
                                             <TableCell align="right">{row.carbs}</TableCell>
-                                            <TableCell align="right"><Buttons handleDelete={handleDeleteElements}
-                                                                              element={row}></Buttons></TableCell>
-                                        </TableRow>
-                                    );
+                                            <TableCell align="right">
+                                                <Buttons element={row} onRefresh={refreshRows}
+                                                         onDeleteSelected={removeSelectedFoodWhenDelete}></Buttons>
+                                            </TableCell>
+                                        </TableRow>);
                                 })}
-                                {emptyRows > 0 && (
-                                    <TableRow
+                                {emptyRows > 0 && (<TableRow
                                         style={{
                                             height: 33 * emptyRows,
                                         }}
                                     >
                                         <TableCell colSpan={6}/>
-                                    </TableRow>
-                                )}
+                                    </TableRow>)}
                             </TableBody>
                         </Table>
                     </TableContainer>
@@ -407,8 +299,7 @@ function TableComponent() {
             return total.toString();
         }
 
-        return (
-            (selected?.length ? <Box sx={{width: '100%'}}>
+        return ((<Box sx={{width: '100%'}}>
                 <Paper sx={{width: '100%', mb: 2}} style={{padding: "20px"}}>
                     <TableContainer>
                         <Table
@@ -418,7 +309,7 @@ function TableComponent() {
                         >
                             <EnhancedTableHead
                                 key={"unique"}
-                                numSelected={selected.length}
+                                numSelected={selected?.length}
                                 order={order}
                                 orderBy={orderBy}
                                 onRequestSort={handleRequestSort}
@@ -427,8 +318,7 @@ function TableComponent() {
                                 {selected?.map((row, index) => {
                                     const labelId = `enhanced-table-checkbox-${index}`;
 
-                                    return (
-                                        <>
+                                    return (<>
                                             <TableRow
                                                 hover
                                                 tabIndex={-1}
@@ -448,51 +338,47 @@ function TableComponent() {
                                                 <TableCell align="right">{row.fat}</TableCell>
                                                 <TableCell align="right">{row.carbs}</TableCell>
                                             </TableRow>
-                                        </>
-                                    );
+                                        </>);
                                 })}
 
-                                {
-                                    <TableRow
-                                        hover
-                                        tabIndex={-1}
-                                        key={99999}
-                                        sx={{cursor: 'pointer'}}
-                                    >
-                                        <TableCell align="right" style={{fontWeight: "bold"}}>Total:</TableCell>
-                                        <TableCell align="right" style={{fontWeight: "bold"}}>
-                                            {sumSpecificProp('kcal')} (kcal)
-                                        </TableCell>
-                                        <TableCell align="right" style={{fontWeight: "bold"}}>
-                                            {sumSpecificProp('protein')} (g)
-                                        </TableCell>
-                                        <TableCell align="right" style={{fontWeight: "bold"}}>
-                                            {sumSpecificProp('fat')} (g)
-                                        </TableCell>
-                                        <TableCell align="right" style={{fontWeight: "bold"}}>
-                                            {sumSpecificProp('carbs')} (g)
-                                        </TableCell>
-                                    </TableRow>
-                                }
+                                {<TableRow
+                                    hover
+                                    tabIndex={-1}
+                                    key={99999}
+                                    sx={{cursor: 'pointer'}}
+                                >
+                                    <TableCell align="right" style={{fontWeight: "bold"}}>Total:</TableCell>
+                                    <TableCell align="right" style={{fontWeight: "bold"}}>
+                                        {sumSpecificProp('kcal')} (kcal)
+                                    </TableCell>
+                                    <TableCell align="right" style={{fontWeight: "bold"}}>
+                                        {sumSpecificProp('protein')} (g)
+                                    </TableCell>
+                                    <TableCell align="right" style={{fontWeight: "bold"}}>
+                                        {sumSpecificProp('fat')} (g)
+                                    </TableCell>
+                                    <TableCell align="right" style={{fontWeight: "bold"}}>
+                                        {sumSpecificProp('carbs')} (g)
+                                    </TableCell>
+                                </TableRow>}
                             </TableBody>
                         </Table>
                     </TableContainer>
                 </Paper>
-            </Box> : '')
+            </Box>)
 
         );
     }
 
-    return (
-        <div>
-            <div>
-                {EnhancedTable()}
-            </div>
+    return (<div>
             <div>
                 {SelectedTable()}
             </div>
-        </div>
-    );
+            <div>
+                {EnhancedTable()}
+            </div>
+
+        </div>);
 }
 
 export default TableComponent;
